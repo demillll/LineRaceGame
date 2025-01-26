@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace LineRaceGame
+namespace WpfApp1
 {
 	public partial class RoleSelectionWindow : Window
 	{

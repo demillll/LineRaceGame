@@ -52,9 +52,38 @@ namespace LineRaceGame
 			WindowRenderTarget r = dx2d.RenderTarget;
 			r.Transform = matrix;
 
-			// Получаем текущий спрайт и рисуем его
-			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
-			r.DrawBitmap(bitmap, opacity, BitmapInterpolationMode.Linear);
+			// Проверка на null перед использованием анимации
+			if (sprite?.animation != null)
+			{
+				try
+				{
+					// Получаем текущий спрайт и рисуем его
+					SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+
+					if (bitmap != null)
+					{
+						r.DrawBitmap(bitmap, opacity, BitmapInterpolationMode.Linear);
+					}
+					else
+					{
+						Console.WriteLine("Ошибка: Получен пустой или некорректный спрайт.");
+					}
+				}
+				catch (AccessViolationException ex)
+				{
+					Console.WriteLine($"AccessViolationException: {ex.Message}");
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"Ошибка при рисовании спрайта: {ex.Message}");
+				}
+			}
+			else
+			{
+				Console.WriteLine("Ошибка: Анимация не инициализирована.");
+			}
 		}
+
+
 	}
 }

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace LineRaceGame
+namespace WpfApp1
 {
 	public partial class MainWindow : Window
 	{
