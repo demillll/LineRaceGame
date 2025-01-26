@@ -1,0 +1,28 @@
+﻿<Window x:Class="LineRaceGame.RoleSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выберите роль" Height="300" Width="300">
+    <StackPanel>
+        <!-- Кнопки для запуска сервера и подключения -->
+        <Button Content="Запустить сервер" Click="StartServerButton_Click" Margin="10"/>
+        <Button Content="Подключиться" Click="ConnectButton_Click" Margin="10"/>
+
+        <!-- Поле для отображения IP-адреса сервера -->
+        <TextBlock x:Name="ServerIpTextBlock" Text="IP сервера: " Margin="10" Visibility="Collapsed"/>
+
+        <!-- Поле для ввода IP-адреса клиента -->
+        <Grid Margin="10" Visibility="Collapsed" x:Name="ClientIpInputContainer">
+            <TextBox x:Name="ClientIpTextBox" VerticalAlignment="Center" Padding="5" />
+            <TextBlock Text="Введите IP сервера" 
+                       Foreground="Gray" 
+                       VerticalAlignment="Center" 
+                       Margin="5,0,0,0" 
+                       IsHitTestVisible="False" 
+                       Visibility="{Binding Text, ElementName=ClientIpTextBox, Converter={StaticResource StringToVisibilityConverter}}"/>
+        </Grid>
+
+        <!-- Метки статуса -->
+        <TextBlock x:Name="ClientStatusTextBlock" Text="Подключитесь к серверу" Margin="10" Visibility="Collapsed" />
+        <TextBlock x:Name="ServerStatusTextBlock" Text="Клиент не подключился" Margin="10" Visibility="Collapsed"/>
+    </StackPanel>
+</Window>
