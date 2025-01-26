@@ -14,7 +14,7 @@ namespace LineRaceGame
 	public class TextRender
 	{
 		public TextFormat textFormat { get; set; }
-		public Brush Brush { get; private set; }
+		public SharpDX.Direct2D1.Brush Brush { get; private set; } // Явно указываем Brush из SharpDX.Direct2D1
 		private SharpDX.DirectWrite.Factory writeFactory = new SharpDX.DirectWrite.Factory();
 
 		public TextRender(RenderTarget renderTarget, int size, ParagraphAlignment paragraphAlignment, TextAlignment textAlignment, Color color)

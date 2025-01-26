@@ -44,7 +44,7 @@ namespace LineRaceGame
 
 			if (string.IsNullOrEmpty(serverIp))
 			{
-				MessageBox.Show("Введите IP-адрес сервера.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show("Введите IP-адрес сервера.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 

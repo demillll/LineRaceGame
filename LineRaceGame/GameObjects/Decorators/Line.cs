@@ -42,7 +42,7 @@ namespace LineRaceGame
 					script.Update(gameObjects);
 				}
 			}
-			Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
 			Vector2 translation = new Vector2();
 			translation.X = sprite.PositionOfCenter.X / bitmap.Size.Width + position.center.X * position.scale;
 			translation.Y = sprite.PositionOfCenter.Y / bitmap.Size.Height + position.center.Y * position.scale;

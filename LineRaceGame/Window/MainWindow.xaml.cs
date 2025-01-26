@@ -25,7 +25,7 @@ namespace LineRaceGame
 		// Обработчик для кнопки "Выход"
 		private void ExitButton_Click(object sender, RoutedEventArgs e)
 		{
-			Application.Current.Shutdown();
+			System.Windows.Application.Current.Shutdown();
 		}
 
 		// Обработчик для кнопки "Играть по локальной сети"

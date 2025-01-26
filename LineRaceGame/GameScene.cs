@@ -94,14 +94,17 @@ namespace LineRaceGame
 				{
 					client = server.AcceptTcpClient();
 					stream = client.GetStream();
+					Console.WriteLine("Соединение установлено с клиентом.");
 				});
 			}
 			else
 			{
 				client = new TcpClient("127.0.0.1", 12345);
 				stream = client.GetStream();
+				Console.WriteLine("Соединение с сервером установлено.");
 			}
 		}
+
 
 		private void RenderCallback()
 		{
@@ -145,8 +148,8 @@ namespace LineRaceGame
 
 			TextRender textRender = new TextRender(dx2d.RenderTarget, 20, SharpDX.DirectWrite.ParagraphAlignment.Near, SharpDX.DirectWrite.TextAlignment.Leading, System.Drawing.Color.Red);
 			target.DrawText(
-				$"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Fuel: {(int)Car1.Fuel}%" +
-				$"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t     Fuel: {(int)Car2.Fuel}%",
+				$"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Fuel: {(int)Car1.Fuel}%" +
+				$"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t     Fuel: {(int)Car2.Fuel}%",
 				textRender.textFormat, clientRect, textRender.Brush);
 
 			target.EndDraw();
@@ -154,32 +157,61 @@ namespace LineRaceGame
 
 		private void SendGameState()
 		{
+			if (stream == null)
+			{
+				Console.WriteLine("Ошибка: Поток не инициализирован.");
+				return;
+			}
+
 			var gameStates = CollectGameStates();
 			var json = JsonConvert.SerializeObject(gameStates);
 			var data = Encoding.UTF8.GetBytes(json);
-			stream.Write(data, 0, data.Length);
+
+			try
+			{
+				stream.Write(data, 0, data.Length);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ошибка при отправке данных: {ex.Message}");
+			}
 		}
+
 
 		private void ReceiveGameState()
 		{
-			byte[] buffer = new byte[1024];
-			int bytesRead = stream.Read(buffer, 0, buffer.Length);
-			if (bytesRead > 0)
+			if (stream == null)
 			{
-				var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-				var gameStates = JsonConvert.DeserializeObject<List<GameObjectState>>(json);
+				Console.WriteLine("Ошибка: Поток не инициализирован.");
+				return;
+			}
 
-				for (int i = 0; i < gameObjects.Count; i++)
+			byte[] buffer = new byte[1024];
+			try
+			{
+				int bytesRead = stream.Read(buffer, 0, buffer.Length);
+				if (bytesRead > 0)
 				{
-					var state = gameStates[i];
-					var obj = gameObjects[i];
-					obj.Position.center = state.Position;
-					obj.Position.scale = state.Scale;
-					obj.Sprite.SetAnimation(state.AnimationTitle);
-					obj.Sprite.animation.currentSprite = state.CurrentSprite;
+					var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+					var gameStates = JsonConvert.DeserializeObject<List<GameObjectState>>(json);
+
+					for (int i = 0; i < gameObjects.Count; i++)
+					{
+						var state = gameStates[i];
+						var obj = gameObjects[i];
+						obj.Position.center = state.Position;
+						obj.Position.scale = state.Scale;
+						obj.Sprite.SetAnimation(state.AnimationTitle);
+						obj.Sprite.animation.currentSprite = state.CurrentSprite;
+					}
 				}
 			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ошибка при получении данных: {ex.Message}");
+			}
 		}
+
 
 		public List<GameObjectState> CollectGameStates()
 		{
@@ -206,6 +238,18 @@ namespace LineRaceGame
 			stream?.Dispose();
 			server?.Stop();
 			client?.Close();
+		}
+
+		[STAThread]
+		public static void Main()
+		{
+			// Здесь можно выбрать, кто является хостом
+			bool isHost = true; // Укажите true для хоста или false для клиента
+
+			using (var gameScene = new GameScene(isHost))
+			{
+				gameScene.Run();
+			}
 		}
 	}
 }

@@ -65,7 +65,7 @@ namespace LineRaceGame
 				}
 			}
 
-			Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
 
 			// Центр трансляции
 			var translation = new Vector2(

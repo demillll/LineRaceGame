@@ -53,7 +53,7 @@ namespace LineRaceGame
 			r.Transform = matrix;
 
 			// Получаем текущий спрайт и рисуем его
-			Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
 			r.DrawBitmap(bitmap, opacity, BitmapInterpolationMode.Linear);
 		}
 	}

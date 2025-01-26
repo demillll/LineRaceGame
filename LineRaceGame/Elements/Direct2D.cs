@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using SharpDX.WIC;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -50,20 +51,44 @@ namespace LineRaceGame
 		public List<SharpDX.Direct2D1.Bitmap> LoadBitmap(params string[] paths)
 		{
 			var bitmaps = new List<SharpDX.Direct2D1.Bitmap>();
+
 			foreach (var path in paths)
 			{
-				BitmapDecoder decoder = new BitmapDecoder(imagingFactory, path, DecodeOptions.CacheOnDemand);
-				BitmapFrameDecode frame = decoder.GetFrame(0);
-				FormatConverter converter = new FormatConverter(imagingFactory);
-				converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA, BitmapDitherType.None, null, 0.0, BitmapPaletteType.Custom);
-				var bitmap = SharpDX.Direct2D1.Bitmap.FromWicBitmap(RenderTarget, converter);
+				try
+				{
+					// Логирование пути и проверки существования файла
+					Console.WriteLine($"Загружается изображение: {path}");
+					if (!File.Exists(path))
+					{
+						Console.WriteLine($"Ошибка: файл не найден по пути: {path}");
+						continue; // Пропустить этот путь, если файл не найден
+					}
 
-				Utilities.Dispose(ref converter);
-				Utilities.Dispose(ref frame);
-				Utilities.Dispose(ref decoder);
+					// Создание декодера для изображения
+					BitmapDecoder decoder = new BitmapDecoder(imagingFactory, path, DecodeOptions.CacheOnDemand);
+					BitmapFrameDecode frame = decoder.GetFrame(0);
 
-				bitmaps.Add(bitmap);
+					// Конвертация изображения в нужный формат
+					FormatConverter converter = new FormatConverter(imagingFactory);
+					converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA, BitmapDitherType.None, null, 0.0, BitmapPaletteType.Custom);
+
+					// Создание Bitmap на основе WIC
+					var bitmap = SharpDX.Direct2D1.Bitmap.FromWicBitmap(RenderTarget, converter);
+
+					// Очистка ресурсов
+					Utilities.Dispose(ref converter);
+					Utilities.Dispose(ref frame);
+					Utilities.Dispose(ref decoder);
+
+					bitmaps.Add(bitmap);
+				}
+				catch (Exception ex)
+				{
+					// Логирование ошибки в случае исключения
+					Console.WriteLine($"Ошибка при загрузке изображения {path}: {ex.Message}");
+				}
 			}
+
 			return bitmaps;
 		}
 
@@ -77,6 +102,5 @@ namespace LineRaceGame
 			Utilities.Dispose(ref imagingFactory);
 			Utilities.Dispose(ref factory);
 		}
-
 	}
 }
