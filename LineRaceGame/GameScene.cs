@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SharpDX;
-using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
 using Newtonsoft.Json;
-using System.Drawing;
-using System.IO;
-using System.Numerics;
+using System.Net.Sockets;
+using System.Net;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Interop;
-using System.Windows.Media.Imaging;
-using System.Net.Sockets;
-using System.Net;
+using SharpDX.Direct2D1;
+using SharpDX.Mathematics.Interop;
+using SharpDX;
+using System.Numerics;
 
 namespace LineRaceGame
 {
@@ -105,7 +102,6 @@ namespace LineRaceGame
 			}
 		}
 
-
 		private void RenderCallback()
 		{
 			TimeHelper.Update();
@@ -177,7 +173,6 @@ namespace LineRaceGame
 			}
 		}
 
-
 		private void ReceiveGameState()
 		{
 			if (stream == null)
@@ -212,7 +207,6 @@ namespace LineRaceGame
 			}
 		}
 
-
 		public List<GameObjectState> CollectGameStates()
 		{
 			return gameObjects.Select(obj => new GameObjectState
@@ -238,18 +232,6 @@ namespace LineRaceGame
 			stream?.Dispose();
 			server?.Stop();
 			client?.Close();
-		}
-
-		[STAThread]
-		public static void Main()
-		{
-			// Здесь можно выбрать, кто является хостом
-			bool isHost = true; // Укажите true для хоста или false для клиента
-
-			using (var gameScene = new GameScene(isHost))
-			{
-				gameScene.Run();
-			}
 		}
 	}
 }
