@@ -222,8 +222,6 @@ namespace LineRaceGame
 		{
 			mainWindow.Show();
 			renderTimer.Start();
-			System.Windows.Application app = new System.Windows.Application();
-			app.Run(mainWindow);
 		}
 
 		public void Dispose()
