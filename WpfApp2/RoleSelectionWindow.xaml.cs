@@ -42,6 +42,10 @@ namespace WpfApp2
 
 		private void ConnectButton_Click(object sender, RoutedEventArgs e)
 		{
+			// Отобразить поле для ввода IP-адреса
+			ClientIpInputContainer.Visibility = Visibility.Visible;
+
+			// Проверяем, был ли введен IP-адрес
 			string serverIp = ClientIpTextBox.Text.Trim();
 
 			if (string.IsNullOrEmpty(serverIp))

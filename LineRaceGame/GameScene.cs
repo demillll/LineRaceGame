@@ -49,7 +49,7 @@ namespace LineRaceGame
 			mainWindow = new Window
 			{
 				Title = "Line Race",
-				Width = 1950,
+				Width = 1920,
 				Height = 1080,
 				WindowStartupLocation = WindowStartupLocation.CenterScreen
 			};

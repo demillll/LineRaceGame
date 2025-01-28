@@ -13,78 +13,87 @@ namespace LineRaceGame
 		public WindowRenderTarget RenderTarget { get; private set; }
 		private ImagingFactory imagingFactory;
 
+		// Конструктор для инициализации Direct2D и WIC
 		public Direct2D(IntPtr hwnd, int width, int height)
 		{
-			// Создание фабрик для 2D объектов
-			factory = new SharpDX.Direct2D1.Factory();
-
-			// Настройка свойств рендеринга
-			RenderTargetProperties renderProp = new RenderTargetProperties
+			try
 			{
-				DpiX = 0,
-				DpiY = 0,
-				MinLevel = FeatureLevel.Level_DEFAULT,
-				PixelFormat = new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied),
-				Type = RenderTargetType.Hardware,
-				Usage = RenderTargetUsage.None
-			};
+				// Инициализация фабрики Direct2D
+				factory = new SharpDX.Direct2D1.Factory();
 
-			// Свойства окна
-			HwndRenderTargetProperties winProp = new HwndRenderTargetProperties
+				// Свойства рендера
+				RenderTargetProperties renderProp = new RenderTargetProperties
+				{
+					DpiX = 96,
+					DpiY = 96,
+					MinLevel = FeatureLevel.Level_DEFAULT,
+					PixelFormat = new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
+					Type = RenderTargetType.Default,
+					Usage = RenderTargetUsage.None
+				};
+
+				// Свойства окна
+				HwndRenderTargetProperties winProp = new HwndRenderTargetProperties
+				{
+					Hwnd = hwnd,
+					PixelSize = new Size2(width, height),
+					PresentOptions = PresentOptions.None
+				};
+
+				// Создание цели рендеринга
+				RenderTarget = new WindowRenderTarget(factory, renderProp, winProp)
+				{
+					AntialiasMode = AntialiasMode.PerPrimitive,
+					TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype
+				};
+
+				Console.WriteLine(RenderTarget == null ? "Ошибка: RenderTarget не создан." : "RenderTarget успешно создан.");
+
+				// Инициализация WIC (Windows Imaging Component)
+				imagingFactory = new ImagingFactory();
+			}
+			catch (Exception ex)
 			{
-				Hwnd = hwnd,
-				PixelSize = new Size2(width, height),
-				PresentOptions = PresentOptions.None
-			};
-
-			// Создание цели рендеринга
-			RenderTarget = new WindowRenderTarget(factory, renderProp, winProp)
-			{
-				AntialiasMode = AntialiasMode.PerPrimitive,
-				TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype
-			};
-
-			// Инициализация фабрики WIC
-			imagingFactory = new ImagingFactory();
+				Console.WriteLine($"Ошибка при инициализации Direct2D: {ex.Message}");
+				Dispose(); // Освобождение ресурсов в случае ошибки
+			}
 		}
 
+		// Метод для загрузки битмапов из файлов
 		public List<SharpDX.Direct2D1.Bitmap> LoadBitmap(params string[] paths)
 		{
 			var bitmaps = new List<SharpDX.Direct2D1.Bitmap>();
 
 			foreach (var path in paths)
 			{
+				// Проверка пути и существования файла
+				if (!File.Exists(path))
+				{
+					Console.WriteLine($"Ошибка: файл не найден по пути {path}");
+					continue;
+				}
+
 				try
 				{
-					// Логирование пути и проверки существования файла
-					Console.WriteLine($"Загружается изображение: {path}");
-					if (!File.Exists(path))
-					{
-						Console.WriteLine($"Ошибка: файл не найден по пути: {path}");
-						continue; // Пропустить этот путь, если файл не найден
-					}
+					Console.WriteLine($"Загрузка изображения: {path}");
 
 					// Создание декодера для изображения
-					BitmapDecoder decoder = new BitmapDecoder(imagingFactory, path, DecodeOptions.CacheOnDemand);
-					BitmapFrameDecode frame = decoder.GetFrame(0);
+					using (var decoder = new BitmapDecoder(imagingFactory, path, DecodeOptions.CacheOnDemand))
+					using (var frame = decoder.GetFrame(0))
+					using (var converter = new FormatConverter(imagingFactory))
+					{
+						// Конвертация изображения в формат 32bpp PRGBA
+						converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA, BitmapDitherType.None, null, 0.0, BitmapPaletteType.Custom);
 
-					// Конвертация изображения в нужный формат
-					FormatConverter converter = new FormatConverter(imagingFactory);
-					converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA, BitmapDitherType.None, null, 0.0, BitmapPaletteType.Custom);
+						// Создание Bitmap для Direct2D
+						var bitmap = SharpDX.Direct2D1.Bitmap.FromWicBitmap(RenderTarget, converter);
+						bitmaps.Add(bitmap);
 
-					// Создание Bitmap на основе WIC
-					var bitmap = SharpDX.Direct2D1.Bitmap.FromWicBitmap(RenderTarget, converter);
-
-					// Очистка ресурсов
-					Utilities.Dispose(ref converter);
-					Utilities.Dispose(ref frame);
-					Utilities.Dispose(ref decoder);
-
-					bitmaps.Add(bitmap);
+						Console.WriteLine($"Изображение успешно загружено: {path}");
+					}
 				}
 				catch (Exception ex)
 				{
-					// Логирование ошибки в случае исключения
 					Console.WriteLine($"Ошибка при загрузке изображения {path}: {ex.Message}");
 				}
 			}
@@ -92,15 +101,27 @@ namespace LineRaceGame
 			return bitmaps;
 		}
 
+		// Метод освобождения ресурсов
 		public void Dispose()
 		{
-			if (RenderTarget != null)
+			try
 			{
-				RenderTarget.Dispose();
+				// Освобождение целей рендеринга и фабрик
+				RenderTarget?.Dispose();
 				RenderTarget = null;
+
+				imagingFactory?.Dispose();
+				imagingFactory = null;
+
+				factory?.Dispose();
+				factory = null;
+
+				Console.WriteLine("Direct2D успешно освобождён.");
 			}
-			Utilities.Dispose(ref imagingFactory);
-			Utilities.Dispose(ref factory);
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ошибка при освобождении ресурсов Direct2D: {ex.Message}");
+			}
 		}
 	}
 }
