@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Windows;
 using LineRaceGame;
-
 
 namespace WpfApp2
 {
@@ -13,6 +16,9 @@ namespace WpfApp2
 		public RoleSelectionWindow()
 		{
 			InitializeComponent();
+
+			// Поле для ввода IP-адреса доступно с самого начала
+			ClientIpInputContainer.Visibility = Visibility.Visible;
 		}
 
 		private void StartServerButton_Click(object sender, RoutedEventArgs e)
@@ -21,8 +27,17 @@ namespace WpfApp2
 			_server.ClientMessageReceived += OnClientMessageReceived;
 			_server.StartServer(12345);
 
-			// Отображаем IP-адрес сервера
-			ServerIpTextBlock.Text = $"IP сервера: {_server.GetLocalIpAddress()}";
+			// Получение и отображение IPv4-адресов
+			var wifiIp = GetLocalIpAddress("Wi-Fi");
+			var ethernetIp = GetLocalIpAddress("Ethernet");
+
+			string ipInfo = "IP сервера:";
+			if (!string.IsNullOrEmpty(wifiIp))
+				ipInfo += $"\nWi-Fi: {wifiIp}";
+			if (!string.IsNullOrEmpty(ethernetIp))
+				ipInfo += $"\nEthernet: {ethernetIp}";
+
+			ServerIpTextBlock.Text = ipInfo;
 			ServerIpTextBlock.Visibility = Visibility.Visible;
 
 			// Показываем статус ожидания клиента
@@ -42,9 +57,6 @@ namespace WpfApp2
 
 		private void ConnectButton_Click(object sender, RoutedEventArgs e)
 		{
-			// Отобразить поле для ввода IP-адреса
-			ClientIpInputContainer.Visibility = Visibility.Visible;
-
 			// Проверяем, был ли введен IP-адрес
 			string serverIp = ClientIpTextBox.Text.Trim();
 
@@ -71,6 +83,33 @@ namespace WpfApp2
 					this.Close(); // Закрываем окно выбора роли
 				});
 			};
+		}
+
+		private string GetLocalIpAddress(string adapterName)
+		{
+			try
+			{
+				var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+					.Where(ni => ni.OperationalStatus == OperationalStatus.Up && ni.Name.Contains(adapterName));
+
+				foreach (var adapter in networkInterfaces)
+				{
+					var ipProperties = adapter.GetIPProperties();
+					var ipv4Address = ipProperties.UnicastAddresses
+						.FirstOrDefault(ua => ua.Address.AddressFamily == AddressFamily.InterNetwork);
+
+					if (ipv4Address != null)
+					{
+						return ipv4Address.Address.ToString();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Ошибка при получении IP-адреса для {adapterName}: {ex.Message}");
+			}
+
+			return null;
 		}
 
 		private void OnClientMessageReceived(string message)

@@ -22,18 +22,6 @@ namespace LineRaceGame
 
 		public void Draw(float opacity, float scale, float textureScale, float height, Direct2D dx2d)
 		{
-			// Проверки масштаба
-			if (scale <= 0 || textureScale <= 0)
-			{
-				Console.WriteLine("Ошибка: Некорректный масштаб.");
-				return;
-			}
-
-			if (GameScene.WorldScale <= 0)
-			{
-				Console.WriteLine("Ошибка: Некорректное значение WorldScale.");
-				return;
-			}
 
 			// Перемещение для преобразования
 			Vector2 translation = new Vector2
@@ -65,40 +53,11 @@ namespace LineRaceGame
 			WindowRenderTarget r = dx2d.RenderTarget;
 			r.Transform = matrix;
 
-			// Проверка на null перед использованием анимации
-			if (sprite?.animation == null || sprite.animation.sprites.Count == 0)
-			{
-				Console.WriteLine("Ошибка: Анимация не инициализирована или не содержит кадров.");
-				return;
-			}
-
-			try
-			{
-				// Получаем текущий спрайт и рисуем его
-				SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
-
-				if (bitmap == null)
-				{
-					Console.WriteLine("Ошибка: Bitmap не загружен.");
-					return;
-				}
-
-				if (opacity < 0.0f || opacity > 1.0f)
-				{
-					Console.WriteLine("Ошибка: Прозрачность вне допустимого диапазона (0.0 - 1.0).");
-					return;
-				}
-
-				r.DrawBitmap(bitmap, opacity, BitmapInterpolationMode.Linear);
-			}
-			catch (AccessViolationException ex)
-			{
-				Console.WriteLine($"AccessViolationException: {ex.Message}");
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Ошибка при рисовании спрайта: {ex.Message}");
-			}
+			
+			// Получаем текущий спрайт и рисуем его
+			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+			r.DrawBitmap(bitmap, opacity, BitmapInterpolationMode.Linear);
+			
 		}
 
 

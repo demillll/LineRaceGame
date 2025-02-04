@@ -16,47 +16,39 @@ namespace LineRaceGame
 		// Конструктор для инициализации Direct2D и WIC
 		public Direct2D(IntPtr hwnd, int width, int height)
 		{
-			try
+			factory = new SharpDX.Direct2D1.Factory();
+
+			// Свойства рендера
+			RenderTargetProperties renderProp = new RenderTargetProperties
 			{
-				// Инициализация фабрики Direct2D
-				factory = new SharpDX.Direct2D1.Factory();
+				DpiX = 0,
+				DpiY = 0,
+				MinLevel = FeatureLevel.Level_DEFAULT,
+				PixelFormat = new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied),
+				Type = RenderTargetType.Default,
+				Usage = RenderTargetUsage.None
+			};
 
-				// Свойства рендера
-				RenderTargetProperties renderProp = new RenderTargetProperties
-				{
-					DpiX = 96,
-					DpiY = 96,
-					MinLevel = FeatureLevel.Level_DEFAULT,
-					PixelFormat = new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
-					Type = RenderTargetType.Default,
-					Usage = RenderTargetUsage.None
-				};
-
-				// Свойства окна
-				HwndRenderTargetProperties winProp = new HwndRenderTargetProperties
-				{
-					Hwnd = hwnd,
-					PixelSize = new Size2(width, height),
-					PresentOptions = PresentOptions.None
-				};
-
-				// Создание цели рендеринга
-				RenderTarget = new WindowRenderTarget(factory, renderProp, winProp)
-				{
-					AntialiasMode = AntialiasMode.PerPrimitive,
-					TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype
-				};
-
-				Console.WriteLine(RenderTarget == null ? "Ошибка: RenderTarget не создан." : "RenderTarget успешно создан.");
-
-				// Инициализация WIC (Windows Imaging Component)
-				imagingFactory = new ImagingFactory();
-			}
-			catch (Exception ex)
+			// Свойства окна
+			HwndRenderTargetProperties winProp = new HwndRenderTargetProperties
 			{
-				Console.WriteLine($"Ошибка при инициализации Direct2D: {ex.Message}");
-				Dispose(); // Освобождение ресурсов в случае ошибки
-			}
+				Hwnd = hwnd,
+				PixelSize = new Size2(width, height),
+				PresentOptions = PresentOptions.None
+			};
+
+			// Создание цели рендеринга
+			RenderTarget = new WindowRenderTarget(factory, renderProp, winProp)
+			{
+				AntialiasMode = AntialiasMode.PerPrimitive,
+				TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype
+			};
+
+			Console.WriteLine(RenderTarget == null ? "Ошибка: RenderTarget не создан." : "RenderTarget успешно создан.");
+
+			// Инициализация WIC (Windows Imaging Component)
+			imagingFactory = new ImagingFactory();
+			
 		}
 
 		// Метод для загрузки битмапов из файлов

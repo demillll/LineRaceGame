@@ -12,46 +12,39 @@ namespace LineRaceGame
 
 	public class Sprite
 	{
+		//"positionOfCenter" - вектор, который содержит координаты центра спрайта в игровом пространстве;
+		// Положение центра спрайта в игровом пространстве (20 единиц измерения на высоту поля отображения)
 		private Vector2 positionOfCenter;
 		public Vector2 PositionOfCenter { get => positionOfCenter; set => positionOfCenter = value; }
 
+		//"animation" - объект класса "GameAnimation", который представляет анимацию спрайта;
 		public GameAnimation animation { get; set; }
+		//"defaultAnimation" - объект класса "GameAnimation", который содержит анимацию по умолчанию.
 		public GameAnimation defaultAnimation { get; set; }
 
 		public Sprite(string animationTitle)
 		{
 			SetAnimation(animationTitle);
 			defaultAnimation = animation;
-
-			// Убедимся, что анимация не null и содержит хотя бы один спрайт
-			if (animation != null && animation.sprites.Count > 0)
-			{
-				// Получаем первый спрайт для установки позиции
-				var currentSprite = animation.GetCurrentSprite(this);
-				positionOfCenter.X = currentSprite.Size.Width / 2;
-				positionOfCenter.Y = currentSprite.Size.Height / 2;
-			}
-			else
-			{
-				Console.WriteLine($"Ошибка: Анимация '{animationTitle}' не инициализирована или не содержит кадров.");
-			}
+			var currentSprite = animation.GetCurrentSprite(this);
+			positionOfCenter.X = currentSprite.Size.Width / 2;
+			positionOfCenter.Y = currentSprite.Size.Height / 2;
+			
 		}
 
 		public void SetAnimation(string title)
 		{
 			if (GameAnimation.animations.ContainsKey(title))
 			{
-				animation = GameAnimation.animations[title];
-
-				// Если анимация бесконечная, то устанавливаем её как дефолтную
-				if (animation.endless)
+				if (GameAnimation.animations[title].endless == false)
 				{
-					defaultAnimation = animation;
+					this.animation = GameAnimation.animations[title];
 				}
-			}
-			else
-			{
-				Console.WriteLine($"Ошибка: Анимация с названием '{title}' не найдена.");
+				else
+				{
+					this.animation = GameAnimation.animations[title];
+					this.defaultAnimation = GameAnimation.animations[title];
+				}
 			}
 		}
 	}

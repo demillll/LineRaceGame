@@ -39,33 +39,20 @@ namespace LineRaceGame
 
 		public SharpDX.Direct2D1.Bitmap GetCurrentSprite(Sprite sprite)
 		{
-			// Проверка на корректность времени для смены кадра
 			if (animationTime <= TimeHelper.Time)
-			{
-				currentSprite++;  // Переход к следующему кадру
-				animationTime += timeCounter;
-			}
-
-			// Если индекс кадра выходит за пределы списка, сбрасываем его в 0 или в конец (если анимация бесконечная)
-			if (currentSprite >= sprites.Count)
-			{
-				if (!endless)
-				{
-					sprite.animation = sprite.defaultAnimation; // Смена анимации по умолчанию, если анимация не бесконечная
-				}
-				currentSprite = 0;  // Возврат на первый кадр, если анимация не бесконечная
-			}
-
-			// Проверка на допустимость индекса
-			if (currentSprite >= 0 && currentSprite < sprites.Count)
-			{
-				return sprites[currentSprite];  // Возвращаем кадр, если индекс в пределах списка
-			}
-			else
-			{
-				Console.WriteLine($"Ошибка: индекс кадра ({currentSprite}) выходит за пределы списка.");
-				return null;  // Возвращаем null, если произошла ошибка с индексом
-			}
+            {
+                currentSprite++;
+                animationTime += timeCounter;
+            }
+            if (currentSprite >= sprites.Count)
+            {
+                if (endless == false)
+                {
+                    sprite.animation = sprite.defaultAnimation;
+                }
+                currentSprite = 0;
+            }
+            return sprites[currentSprite];
 		}
 
 	}
