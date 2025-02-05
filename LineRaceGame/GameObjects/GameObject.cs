@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 
-namespace LineRaceGame
+namespace LineRaceGame.GameObjects
 {
 	public class GameObject
 	{
@@ -153,35 +153,14 @@ namespace LineRaceGame
 			}
 		}
 
-		/// <summary>
-		/// Получение состояния объекта для передачи по сети
-		/// </summary>
-		public virtual GameObjectState GetState()
-		{
-			return new GameObjectState
-			{
-				Position = position.center,
-				Scale = position.scale,
-				AnimationTitle = sprite.animation.title,
-				CurrentSprite = sprite.animation.currentSprite
-			};
-		}
-
-		/// <summary>
-		/// Обновление состояния объекта на основе данных от сети
-		/// </summary>
-		/// <param name="state">Состояние объекта</param>
-		public virtual void UpdateState(GameObjectState state)
-		{
-			position.center = state.Position;
-			position.scale = state.Scale;
-			sprite.SetAnimation(state.AnimationTitle);
-			sprite.animation.currentSprite = state.CurrentSprite;
-		}
+		
 
 		/// <summary>
 		/// Конструктор базового класса 
 		/// </summary>
-		public GameObject() { }
+		public GameObject()
+		{
+		}
+
 	}
 }

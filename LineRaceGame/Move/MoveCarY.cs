@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LineRaceGame.GameObjects;
 using SharpDX;
 using SharpDX.DirectInput;
 

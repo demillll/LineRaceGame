@@ -1,6 +1,7 @@
 ﻿using SharpDX;
 using System.Numerics;
 using SharpDX.DirectInput;
+using LineRaceGame.GameObjects;
 
 
 namespace LineRaceGame

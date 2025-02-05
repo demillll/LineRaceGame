@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 
-namespace LineRaceGame
+namespace LineRaceGame.GameObjects
 {
 	public class BackgroundLoseWin : GameObject
 	{
@@ -27,7 +27,7 @@ namespace LineRaceGame
 		public BackgroundLoseWin(Sprite sprite, Vector2 startPos, float scale, bool site) : base(sprite, startPos, scale, site)
 		{
 			this.sprite = sprite;
-			this.position = new Position(startPos.X, startPos.Y, 0.0f, scale);
+			position = new Position(startPos.X, startPos.Y, 0.0f, scale);
 			this.scale = scale;
 			IsActiv = false;
 		}

@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 
-namespace LineRaceGame
+namespace LineRaceGame.GameObjects
 {
 	public class Car : GameObject
 	{
@@ -65,7 +65,7 @@ namespace LineRaceGame
 				}
 			}
 
-			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(this.sprite);
+			SharpDX.Direct2D1.Bitmap bitmap = sprite.animation.GetCurrentSprite(sprite);
 
 			// Центр трансляции
 			var translation = new Vector2(

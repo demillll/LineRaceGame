@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 
-namespace LineRaceGame
+namespace LineRaceGame.GameObjects
 {
 	class Line : GameObject
 	{

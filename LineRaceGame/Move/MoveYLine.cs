@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LineRaceGame.GameObjects;
 using SharpDX;
 using SharpDX.DirectInput;
 
@@ -81,16 +82,7 @@ namespace LineRaceGame
 
 					}
 				}
-
-
-
 			}
-
-
 		}
-
-
-
-
 	}
 }

@@ -12,6 +12,7 @@ using System.Windows.Interop;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 using SharpDX;
+using LineRaceGame.GameObjects;
 using System.Numerics;
 
 namespace LineRaceGame
